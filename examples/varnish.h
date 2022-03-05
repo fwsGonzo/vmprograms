@@ -6,7 +6,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern void register_func(...);
+extern void register_func(int, ...);
 
 /**
  * During the start of the program, one should register functions that will

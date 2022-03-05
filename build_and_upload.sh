@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 tmpfile=$(mktemp /tmp/abc-script.XXXXXX)
 
 source="$1"

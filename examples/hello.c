@@ -13,12 +13,22 @@ static void nada_processing(void* arg)
 {
 }
 
+static void on_client_request(const char *url)
+{
+	static const char hf[] = "X-KVM-Front: 1";
+	// NOTE: This header field will not appear in cached results
+	// For that we will have to append to RESP in DELIVER
+	http_append(1, hf, sizeof(hf)-1);
+	storage_return_nothing();
+}
+
 static void
 handle_get(const char *arg, int a, int b)
 {
 //	multiprocess(8, nada_processing, NULL);
 //	multiprocess_wait();
-	const char ctype[] = "text/plain";
+	set_cacheable(0, 1.0f);
+	static const char ctype[] = "text/plain";
 	backend_response(200, ctype, sizeof(ctype)-1, data, datalen);
 }
 
@@ -111,6 +121,7 @@ int main(int argc, char **argv)
 	printf("Hello from '%s'! Storage=%s\n", argv[1], argv[2]);
 #endif
 
+	set_on_recv(on_client_request);
 	set_backend_get(handle_get);
 	set_backend_post(handle_post);
 	set_backend_stream_post(handle_streaming_post);
