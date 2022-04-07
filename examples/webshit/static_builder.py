@@ -6,7 +6,7 @@ location = "res"
 mime = mimetypes.MimeTypes()
 
 file = open("/tmp/static_builder.c", "w")
-file.write('#include "../api.h"\n')
+file.write('#include "../varnish.h"\n')
 file.write('#include "crc32.h"\n')
 file.write('#include <stdio.h>\n')
 file.write('\n')
@@ -45,18 +45,11 @@ for path, subdirs, files in os.walk(location):
         cases.append('    backend_response(200, ctype, sizeof(ctype)-1, ' + bname + ', ' + bname + '_size);\n')
         cases.append('  } break;\n')
 
-bincount = str(len(binaries))
-file.write('int main(int argc, char** argv) {\n')
-file.write('  printf("Static resource builder with ' + bincount + ' objects initialized!\\n");\n')
-file.write('}\n')
-file.write('\n')
-
 for bin in binaries:
     file.write(bin)
 file.write('\n')
 
-file.write('extern __attribute__((used))\n')
-file.write('void my_backend(const char *arg)\n')
+file.write('static void my_backend(const char *arg, int req, int resp)\n')
 file.write('{\n')
 file.write('  const uint32_t crc = crc32(arg);\n')
 file.write('  switch (crc) {\n')
@@ -70,5 +63,13 @@ file.write('    const char cont[] = "Resource not found";\n')
 file.write('    backend_response(404, ctype, sizeof(ctype)-1, cont, sizeof(cont)-1);\n')
 file.write('  } /* switch(crc) */\n')
 file.write('} /* my_backend */\n')
+
+bincount = str(len(binaries))
+file.write('\n')
+file.write('int main(int argc, char** argv) {\n')
+file.write('  printf("Static resource builder with ' + bincount + ' objects initialized!\\n");\n')
+file.write('  set_backend_get(my_backend);\n')
+file.write('  wait_for_requests();\n')
+file.write('}\n')
 
 file.close()
