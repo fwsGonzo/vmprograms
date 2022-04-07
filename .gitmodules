@@ -8,7 +8,7 @@
 	path = examples/Stockfish
 	url = https://github.com/official-stockfish/Stockfish.git
 [submodule "examples/dynamic_website/json"]
-	path = examples/dynamic_website/json
+	path = examples/chat/json
 	url = https://github.com/nlohmann/json.git
 [submodule "examples/quickJS/quickjs"]
 	path = examples/quickJS/quickjs

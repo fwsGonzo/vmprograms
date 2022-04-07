@@ -1,4 +1,4 @@
-#include "../api.h"
+#include "../varnish.h"
 #include <string>
 #include <vector>
 
@@ -32,7 +32,7 @@ struct Storage {
 	static size_t call(storage_func func, void* in_data, size_t in_len, std::string& str) {
 		return storage_call(func, in_data, in_len, str.data(), str.size());
 	}
-	static size_t call(storage_func func, void* in_data, size_t in_len, std::vector<uint8_t>& vec) {
+	static size_t call(storage_func func, const void* in_data, size_t in_len, std::vector<uint8_t>& vec) {
 		return storage_call(func, in_data, in_len, vec.data(), vec.size());
 	}
 

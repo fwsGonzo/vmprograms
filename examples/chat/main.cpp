@@ -7,14 +7,10 @@ extern "C" {
 }
 EMBED_BINARY(index_html, "../index.html")
 
-int main() {
-	printf("C++ JSON example main\n");
-}
 /* Make pre-allocated 4KB result */
 static std::vector<uint8_t> result(4096);
 
-extern "C" __attribute__((used))
-void my_backend(const char *arg)
+static void on_backend_get(const char *arg, int, int)
 {
 	const std::string path {arg};
 	if (path == "/" || path == "/w") {
@@ -29,8 +25,8 @@ void my_backend(const char *arg)
 	Backend::response(404, "text/plain", "Unknown location");
 }
 
-extern "C" __attribute__((used))
-void my_post_backend(const char* /* arg */, void* data, size_t len)
+static void on_backend_post(
+	const char* /* arg */, const uint8_t* data, size_t len)
 {
 	size_t reslen = Storage::call(set_json, data, len, result);
 	result.resize(reslen);
@@ -44,6 +40,7 @@ std::string text;
 
 void retrieve_json(size_t n, virtbuffer buffers[n], size_t)
 {
+	(void) buffers;
 	Storage::response(text);
 }
 
@@ -56,4 +53,11 @@ void set_json(size_t n, virtbuffer buffers[n], size_t)
 	text += j["text"].get<std::string>() + "\n";
 
 	Storage::response(text);
+}
+
+int main() {
+	printf("C++ JSON example main\n");
+	set_backend_get(on_backend_get);
+	set_backend_post(on_backend_post);
+	wait_for_requests();
 }
