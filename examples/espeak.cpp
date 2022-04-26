@@ -69,15 +69,15 @@ static int callback(short* s, int length, espeak_EVENT* ev)
 }
 
 static const int buflength = 500;
-static void text_to_speech(const char *text, int, int)
+static void text_to_speech(const char *url, const char* arg, int, int)
 {
 	static const unsigned int flags = espeakCHARS_AUTO;
 	unsigned int* identifier = NULL;
 	void* user_data = NULL;
 
 	// Skip the /x portion of the URL
-	printf("Saying  '%s'...\n", &text[2]);
-	espeak_Synth(&text[2], buflength, 0, POS_CHARACTER, 0, flags, identifier, user_data);
+	printf("Saying  '%s'...\n", arg);
+	espeak_Synth(arg, buflength, 0, POS_CHARACTER, 0, flags, identifier, user_data);
 
 	finalizeWAV(wav, sampleCount);
 

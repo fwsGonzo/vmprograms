@@ -23,10 +23,8 @@ static void on_client_request(const char *url)
 }
 
 static void
-handle_get(const char *arg, int a, int b)
+handle_get(const char *url, const char *arg, int a, int b)
 {
-//	multiprocess(8, nada_processing, NULL);
-//	multiprocess_wait();
 	set_cacheable(0, 1.0f);
 	static const char ctype[] = "text/plain";
 	backend_response(200, ctype, sizeof(ctype)-1, data, datalen);
