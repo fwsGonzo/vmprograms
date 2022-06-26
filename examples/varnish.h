@@ -30,7 +30,7 @@ extern void register_func(int, ...);
 static inline void set_on_recv(void(*f)(const char*)) { register_func(0, f); }
 static inline void set_backend_get(void(*f)(const char*, const char*, int, int)) { register_func(1, f); }
 static inline void set_backend_post(void(*f)(const char*, const uint8_t*, size_t)) { register_func(2, f); }
-static inline void set_backend_stream_post(void(*f)(const uint8_t*, size_t)) { register_func(3, f); }
+static inline void set_backend_stream_post(long(*f)(const uint8_t*, size_t)) { register_func(3, f); }
 
 static inline void set_on_live_update(void(*f)()) { register_func(4, f); }
 static inline void set_on_live_restore(void(*f)(size_t)) { register_func(5, f); }
@@ -131,10 +131,6 @@ storage_return(const void* data, size_t len);
 
 static inline void
 storage_return_nothing(void) { storage_return(NULL, 0); }
-
-/* Record the current state into a new VM, and make that
-   VM handle future requests. WARNING: RCU, Racy. */
-extern long vmcommit(void);
 
 /* Start multi-processing using @n vCPUs on given function,
    forwarding up to 4 integral/pointer arguments.
@@ -296,13 +292,6 @@ asm(".global storage_return\n" \
 ".type storage_return, function\n" \
 "storage_return:\n" \
 "	mov $0xFFFF, %eax\n" \
-"	out %eax, $0\n" \
-"   ret\n");
-
-asm(".global vmcommit\n" \
-".type vmcommit, function\n" \
-"vmcommit:\n" \
-"	mov $0x1070A, %eax\n" \
 "	out %eax, $0\n" \
 "   ret\n");
 
